@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Header.css";
 
-const Header = () => {
+const Header = ({ onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -16,7 +16,9 @@ const Header = () => {
       <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
         <Link to="/" className="nav-item" onClick={() => setMenuOpen(false)}>Heatmap</Link>
         <Link to="/report" className="nav-item" onClick={() => setMenuOpen(false)}>Report Crime</Link>
+         <Link to="/chart" className="nav-item" onClick={() => setMenuOpen(false)}>Chart</Link>
             <Link to="/hotspot" className="nav-item" onClick={() => setMenuOpen(false)}>Future Hotspot</Link>
+            <button className="btn"  onClick={onLogout} >Log Out</button>
       </nav>
     </header>
   );

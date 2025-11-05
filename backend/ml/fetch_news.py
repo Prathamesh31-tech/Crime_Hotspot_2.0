@@ -18,7 +18,7 @@ logger = logging.getLogger()
 try:
     model = joblib.load("crime_model.pkl", mmap_mode="r")
     vectorizer = joblib.load("vectorizer.pkl", mmap_mode="r")
-    logger.info("✅ Model & vectorizer loaded successfully (mmap_mode='r').")
+    logger.info("✅ Model & vectorizer loaded successfully.")
 except Exception as e:
     logger.error(f"❌ Error loading model/vectorizer: {e}")
     raise
@@ -28,36 +28,88 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["crime-db"]
 collection = db["posts"]
 
-# ----------------- Geopy Setup -----------------
-geolocator = Nominatim(user_agent="crime-news-locator")
+# ----------------- Geocoding Setup -----------------
+geolocator = Nominatim(user_agent="SmartCrimeSystem/1.0 (prathamesh31-tech; contact@example.com)")
 
-# Maharashtra cities
-maharashtra_cities = [
-    "Mumbai", "Pune", "Nagpur", "Nashik", "Thane", "Aurangabad", "Solapur", "Jalgaon",
-    "Amravati", "Kolhapur", "Nanded", "Sangli", "Latur", "Ahmednagar", "Chandrapur", "Parbhani"
-]
+# ----------------- Recent News Memory Cache -----------------
+recent_titles = set()
+MAX_CACHE_SIZE = 500  # prevent memory growth
+
+def already_seen(title):
+    """Check if article title already processed recently."""
+    if title in recent_titles:
+        return True
+    recent_titles.add(title)
+    if len(recent_titles) > MAX_CACHE_SIZE:
+        # Remove oldest entries to keep cache small
+        recent_titles.pop()
+    return False
+
+# ----------------- Static City Cache -----------------
+city_cache = {
+    "Mumbai": (19.0760, 72.8777),
+    "Pune": (18.5204, 73.8567),
+    "Nagpur": (21.1458, 79.0882),
+    "Nashik": (19.9975, 73.7898),
+    "Thane": (19.2183, 72.9781),
+    "Aurangabad": (19.8762, 75.3433),
+    "Solapur": (17.6599, 75.9064),
+    "Jalgaon": (21.0077, 75.5626),
+    "Amravati": (20.9333, 77.7519),
+    "Kolhapur": (16.7050, 74.2433),
+    "Nanded": (19.1383, 77.3210),
+    "Sangli": (16.8524, 74.5815),
+    "Latur": (18.4088, 76.5604),
+    "Ahmednagar": (19.0952, 74.7496),
+    "Chandrapur": (19.9506, 79.2952),
+    "Parbhani": (19.2686, 76.7708)
+}
+
+# ----------------- Helper: Safe Geocoding -----------------
+def geocode_city(city):
+    if city in city_cache:
+        lat, lng = city_cache[city]
+        return {"lat": lat, "lng": lng}
+
+    try:
+        time.sleep(1)
+        location = geolocator.geocode(f"{city}, Maharashtra, India", timeout=10)
+        if location:
+            coords = {"lat": location.latitude, "lng": location.longitude}
+            city_cache[city] = (coords["lat"], coords["lng"])
+            return coords
+    except Exception as e:
+        logger.warning(f"⚠️ Geocode failed for {city}: {e}")
+    return None
+
+# ----------------- Location Extractor -----------------
+maharashtra_cities = list(city_cache.keys())
 
 def extract_maharashtra_location(text):
     for city in maharashtra_cities:
         if city.lower() in text.lower():
-            try:
-                location = geolocator.geocode(f"{city}, Maharashtra, India")
-                if location:
-                    return {"lat": location.latitude, "lng": location.longitude}
-            except Exception as e:
-                logger.warning(f"🌐 Geocode failed for {city}: {e}")
+            coords = geocode_city(city)
+            if coords:
+                return coords
     return None
 
-def is_crime(text):
+# ----------------- Crime Classification -----------------
+def get_crime_level(text):
     try:
         vec = vectorizer.transform([text])
-        return int(model.predict(vec)[0]) == 1
+        return int(model.predict(vec)[0])  # 0, 1, or 2
     except Exception as e:
         logger.error(f"❌ Prediction error: {e}")
-        return False
+        return -1
 
+# ----------------- Save Function -----------------
 def save_if_crime(text, source):
-    if not is_crime(text):
+    if already_seen(text):
+        logger.info(f"⏭️ Skipped recently seen news: {text[:80]}")
+        return
+
+    level = get_crime_level(text)
+    if level not in [0, 1, 2]:
         return
     location = extract_maharashtra_location(text)
     if not location:
@@ -66,47 +118,50 @@ def save_if_crime(text, source):
         collection.insert_one({
             "text": text,
             "location": location,
-            "label": 1,
+            "label": level,
             "source": source,
             "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ")
         })
-        logger.info(f"✅ Saved: {text[:60]}... → {location}")
-        time.sleep(0.5)  # avoid overloading
+        level_name = ["Low", "Medium", "High"][level]
+        logger.info(f"✅ Saved ({level_name}): {text[:80]} → {location}")
     else:
-        logger.info(f"⚠️ Duplicate skipped: {text[:60]}...")
+        logger.info(f"⚠️ Duplicate skipped (in DB): {text[:80]}")
 
 # ----------------- Fetch Functions -----------------
 def fetch_gnews():
-    logger.info("Fetching from GNews.io...")
+    logger.info("🌐 Fetching from GNews.io...")
     try:
         url = "https://gnews.io/api/v4/search?q=crime%20maharashtra&lang=en&country=in&max=20&apikey=572b4058d84f38725165c0979b0aecdb"
         response = requests.get(url, timeout=15)
         data = response.json()
         for article in data.get("articles", []):
-            text = f"{article['title']}. {article.get('description', '')}"
+            title = article['title']
+            text = f"{title}. {article.get('description', '')}"
             save_if_crime(text, "GNews")
     except Exception as e:
         logger.error(f"❌ GNews fetch error: {e}")
 
 def fetch_newsapi():
-    logger.info("Fetching from NewsAPI.org...")
+    logger.info("📰 Fetching from NewsAPI.org...")
     try:
         url = "https://newsapi.org/v2/everything?q=crime%20maharashtra&language=en&apiKey=2de9bd8806444aa3b0bc88bb6d5f14d2"
         response = requests.get(url, timeout=15)
         data = response.json()
         for article in data.get("articles", []):
-            text = f"{article['title']}. {article.get('description', '')}"
+            title = article['title']
+            text = f"{title}. {article.get('description', '')}"
             save_if_crime(text, "NewsAPI")
     except Exception as e:
         logger.error(f"❌ NewsAPI fetch error: {e}")
 
 def fetch_google_rss():
-    logger.info("Fetching from Google RSS...")
+    logger.info("🔎 Fetching from Google RSS...")
     try:
         rss_url = "https://news.google.com/rss/search?q=crime+maharashtra&hl=en-IN&gl=IN&ceid=IN:en"
         feed = feedparser.parse(rss_url)
         for entry in feed.entries:
-            text = f"{entry.title}. {entry.get('description', '')}"
+            title = entry.title
+            text = f"{title}. {entry.get('description', '')}"
             save_if_crime(text, "GoogleRSS")
     except Exception as e:
         logger.error(f"❌ Google RSS fetch error: {e}")
@@ -115,11 +170,13 @@ def fetch_google_rss():
 if __name__ == "__main__":
     while True:
         try:
+            logger.info("🚀 Starting fetch cycle...")
             fetch_gnews()
             fetch_newsapi()
             fetch_google_rss()
-            logger.info("⏳ Waiting 60 seconds...\n")
-            time.sleep(60)
+            logger.info("✅ Cycle complete — waiting 1 hour before next fetch...\n")
+            time.sleep(3600)  # ✅ 1 hour wait on success
         except Exception as e:
             logger.error(f"❌ Main loop error: {e}")
-            time.sleep(60)
+            logger.info("⏳ Retrying in 60 seconds...")
+            time.sleep(60)  # ⚠️ retry after 60 sec on error

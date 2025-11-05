@@ -10,7 +10,7 @@ const HotspotMap = () => {
   const [address, setAddress] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/hotspot")
+    axios.get("http://localhost:8080/api/hotspot")
       .then(res => {
         const hotspotData = res.data.hotspot;
         setHotspot(hotspotData);

@@ -1,0 +1,108 @@
+/* Background animation */
+.signup-container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+/* Card style */
+.signup-card {
+    margin: 10px;
+    display:flex ;
+    flex-direction: column;
+      backdrop-filter: blur(8px); 
+    background: rgba(22, 0, 168, 0.1);
+  padding: 40px;
+  border-radius: 20px;
+  color: #fff;
+  box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+  width: 350px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.signup-title {
+  margin-bottom: 30px;
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-shadow: 0 0 10px #ff4b2b;
+}
+
+/* Input animations */
+.animated-input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  transition: all 0.3s ease;
+  
+  /* ✅ This fixes width overflow */
+  box-sizing: border-box;
+
+
+}
+
+.animated-input::placeholder {
+  color: rgba(255,255,255,0.6);
+  transition: 0.3s;
+}
+
+.animated-input:focus {
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 0 10px #ff4b2b;
+}
+
+/* Button animations */
+.animated-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff4b2b, #ff416c);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 5px 15px rgba(255,75,43,0.4);
+}
+
+.animated-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255,75,43,0.6);
+}
+
+/* Switch link */
+.switch-text {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.switch-link {
+  color: #7151ff;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: 0.3s;
+}
+
+.switch-link:hover {
+  color: #001f99;
+}

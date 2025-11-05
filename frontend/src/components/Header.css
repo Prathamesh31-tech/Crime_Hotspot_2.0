@@ -108,3 +108,19 @@
   font-weight: bold;
   text-shadow: 0 0 10px #ff0000;
 }
+
+.btn{
+    border-radius: 5px;
+    background-color: red;
+    border: none;
+    padding: 5px 10px;
+    color: white;
+    
+}
+
+.btn:hover{
+  cursor: pointer;
+   background-color: rgb(183, 0, 0);
+    padding: 5px 10px;
+    color: white;
+}

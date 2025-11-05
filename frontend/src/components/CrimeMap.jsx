@@ -25,16 +25,16 @@ const CrimeMap = () => {
     const timer = setTimeout(() => setLoading(false), 5000);
 
     // Fetch posts
-    fetch("http://localhost:5000/api/heatmap")
+    fetch("http://localhost:8080/api/heatmap")
       .then((res) => res.json())
       .then(setPosts)
+      
       .catch((err) => console.error("🔥 Fetch error:", err));
 
     return () => clearTimeout(timer);
   }, []);
 
-  const crimeCount = posts.filter((p) => p.label === 1).length;
-
+    console.log(posts);
   const handleLocationSearch = async () => {
     if (!locationQuery.trim()) return;
     try {
@@ -51,7 +51,7 @@ const CrimeMap = () => {
         alert("Location not found.");
       }
     } catch (err) {
-      alert("Error fetching location.");
+      alert(err);
       console.error(err);
     }
   };
@@ -73,31 +73,50 @@ const CrimeMap = () => {
 
       <div className="map-container-wrapper">
         {loading ? (
-             <div className="news">
-        <span className="live" style={{height:"20px"}}>LIVE</span>
-        Loading map....
-         
-      </div>
+          <div className="news">
+            <span className="live" style={{ height: "20px" }}>
+              LIVE
+            </span>
+            Loading map....
+          </div>
         ) : (
           <MapContainer center={mapCenter} zoom={12} className="crime-map">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             <FlyTo coords={mapCenter} />
 
             {posts.map((report, idx) => {
-              const color = report.label === 1 ? "red" : "green";
-              const fillColor = report.label === 1 ? "#f03" : "#0f3";
-              const offsetLat = report.location.lat + (Math.random() - 0.5) * 0.002;
-              const offsetLng = report.location.lng + (Math.random() - 0.5) * 0.002;
+              let color = "green";
+              let fillColor = "green";
+              let labelText = "✅ Normal Activity";
+
+              if (report.label === 2) {
+                color = "red";
+                fillColor = "#ff0000";
+                labelText = "🔴 High-Level Crime";
+              } else if (report.label === 1) {
+                color = "orange";
+                fillColor = "#ffa500";
+                labelText = "🟠 Medium-Level Crime";
+              } else if (report.label === 0) {
+                color = "yellow";
+                fillColor = "#ffff00";
+                labelText = "🟡 Low-Level Crime";
+              }
+
+              const offsetLat =
+                report.location.lat + (Math.random() - 0.5) * 0.002;
+              const offsetLng =
+                report.location.lng + (Math.random() - 0.5) * 0.002;
 
               return (
                 <Circle
                   key={`${report.location.lat}-${report.location.lng}-${idx}`}
                   center={[offsetLat, offsetLng]}
                   radius={150}
-                  pathOptions={{ color, fillColor, fillOpacity: 0.5 }}
+                  pathOptions={{ color, fillColor, fillOpacity: 0.6 }}
                 >
                   <Popup>
-                    <strong>{report.label === 1 ? "🚨 Crime Report" : "✅ Normal Activity"}</strong>
+                    <strong>{labelText}</strong>
                     <br />
                     {report.text.split(".")[0]}
                     <br />
@@ -113,9 +132,17 @@ const CrimeMap = () => {
       </div>
 
       <div className="summary-section">
-        <div className="summary-card crime">
-          <h3>Crimes</h3>
-          <p>{crimeCount}</p>
+        <div className="summary-card high">
+          <h3 style={{color:"red"}}>High-Level Crimes</h3>
+          <p>{posts.filter((p) => p.label === 2).length}</p>
+        </div>
+        <div className="summary-card medium">
+          <h3 style={{color:"orange"}}>Medium-Level Crimes</h3>
+          <p>{posts.filter((p) => p.label === 1).length}</p>
+        </div>
+        <div className="summary-card low">
+          <h3 style={{color:"yellow"}}>Low-Level Crimes</h3>
+          <p>{posts.filter((p) => p.label === 0).length}</p>
         </div>
         <div className="summary-card total">
           <h3>Total</h3>

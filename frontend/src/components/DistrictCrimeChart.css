@@ -1,0 +1,46 @@
+
+
+.district-chart-container {
+  width: 45%;
+  margin-left: 10px;
+  margin-top: 30px;
+    backdrop-filter: blur(8px); 
+    background: rgba(22, 0, 168, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  color: rgb(255, 255, 255);
+
+}
+
+.district-chart-container select {
+  margin: 10px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #003366;
+  color: white;
+  font-size: 16px;
+}
+
+
+
+.top-crime-chart {
+    backdrop-filter: blur(8px); 
+    background: rgba(22, 0, 168, 0.1);
+  border-radius: 10px;
+  width: 260px;
+  height: 350px;
+  margin: 11px ;
+ 
+  text-align: center;
+  padding: 0%;
+}
+
+
+.pieChart{
+    margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+}
