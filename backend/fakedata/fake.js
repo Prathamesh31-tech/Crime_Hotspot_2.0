@@ -3,10 +3,13 @@ const Post = require("../models/Post"); // aapka model
 
 // 🔗 MongoDB connection
 mongoose
-  .connect("mongodb://localhost:27017/crime-db", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(
+    "mongodb+srv://prchaudhari3172_db_user:m6TAbyMSJ0AXJcia@cluster0.xdas6bd.mongodb.net/?appName=Cluster0",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
   .then(() => console.log("🗄 MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
