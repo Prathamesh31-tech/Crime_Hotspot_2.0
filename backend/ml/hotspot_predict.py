@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from sklearn.cluster import KMeans
 
 # Connect to MongoDB
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb+srv://prchaudhari3172_db_user:m6TAbyMSJ0AXJcia@cluster0.xdas6bd.mongodb.net/?appName=Cluster0")
 db = client["crime-db"]
 posts = list(db["posts"].find({"label":1}))  # Only crime reports
 

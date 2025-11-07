@@ -1,13 +1,13 @@
 const cron = require("node-cron");
 const { spawn } = require("child_process");
+const path = require("path");
 
 function runNewsJob() {
   console.log("🕒 Starting cron job to run fetch_news.py every 1 hour...");
 
-  const pythonPath =
-    "C:\\Users\\prcha\\AppData\\Local\\Programs\\Python\\Python313\\python.exe";
-  const scriptPath =
-    "C:\\Users\\prcha\\OneDrive\\Desktop\\Final Year Project\\smart Crime\\backend\\ml\\fetch_news.py";
+  const pythonPath = process.platform === "win32" ? "python" : "python3";
+
+  const scriptPath = path.join(__dirname, "ml", "fetch_news.py");
 
   // ✅ 1️⃣ Immediately run once when server starts
   console.log("🚀 Running fetch_news.py immediately on startup...");
