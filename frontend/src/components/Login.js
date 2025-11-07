@@ -24,7 +24,7 @@ function Login({ onLogin, switchToSignup }) {
         alert(data.error);
       }
     } catch (err) {
-      alert("Server not reachable!");
+      alert(err);
     }
   };
 
