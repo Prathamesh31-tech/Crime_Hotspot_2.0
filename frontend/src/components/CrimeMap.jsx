@@ -25,7 +25,7 @@ const CrimeMap = () => {
     const timer = setTimeout(() => setLoading(false), 5000);
 
     // Fetch posts
-    fetch("http://localhost:8080/api/heatmap")
+    fetch("https://crime-hotspot-2-0-5.onrender.com/api/heatmap")
       .then((res) => res.json())
       .then(setPosts)
       

@@ -10,7 +10,7 @@ const HotspotMap = () => {
   const [address, setAddress] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/hotspot")
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/hotspot")
       .then(res => {
         const hotspotData = res.data.hotspot;
         setHotspot(hotspotData);

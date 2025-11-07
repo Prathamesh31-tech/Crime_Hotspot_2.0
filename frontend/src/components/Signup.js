@@ -9,11 +9,14 @@ function Signup({ switchToLogin }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:8080/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const res = await fetch(
+        "https://crime-hotspot-2-0-5.onrender.com/api/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         alert("Signup successful, please login!");
