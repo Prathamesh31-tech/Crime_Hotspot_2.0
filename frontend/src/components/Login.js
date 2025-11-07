@@ -9,7 +9,7 @@ function Login({ onLogin, switchToSignup }) {
     e.preventDefault();
     try {
       const res = await fetch(
-        "ttps://crime-hotspot-2-0-5.onrender.com/api/login",
+        "https://crime-hotspot-2-0-5.onrender.com/api/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
