@@ -95,7 +95,7 @@ app.post("/api/classify", async (req, res) => {
   const { text, location } = req.body;
 
   try {
-    const result = spawnSync("python", ["./ml/predict.py", text]);
+    const result = spawnSync("python3", ["./ml/predict.py", text]);
     const label = parseInt(result.stdout.toString().trim());
 
     const isAuthenticCrime = (text) => true; // Placeholder
