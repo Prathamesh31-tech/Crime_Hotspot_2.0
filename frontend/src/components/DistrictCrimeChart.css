@@ -1,17 +1,18 @@
-
-
+/* ===============================
+   DISTRICT CRIME CHART STYLING
+================================= */
 .district-chart-container {
-  width: 45%;
-  margin-left: 10px;
+  flex: 1 1 400px; /* Flexible width, min 400px */
+  min-width: 300px;
+  margin: 10px;
   margin-top: 30px;
-    backdrop-filter: blur(8px); 
-    background: rgba(22, 0, 168, 0.1);
+  backdrop-filter: blur(8px); 
+  background: rgba(22, 0, 168, 0.1);
   border-radius: 10px;
   padding: 20px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   color: rgb(255, 255, 255);
-
 }
 
 .district-chart-container select {
@@ -24,23 +25,46 @@
   font-size: 16px;
 }
 
-
-
-.top-crime-chart {
-    backdrop-filter: blur(8px); 
-    background: rgba(22, 0, 168, 0.1);
-  border-radius: 10px;
-  width: 260px;
-  height: 350px;
-  margin: 11px ;
- 
-  text-align: center;
-  padding: 0%;
-}
-
-
-.pieChart{
-    margin-top: 30px;
+/* Pie chart container */
+.pieChart {
   display: flex;
   flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; /* Center charts on smaller screens */
+  margin-top: 30px;
+}
+
+/* Individual pie charts */
+.top-crime-chart {
+  flex: 1 1 250px; /* Flexible width, min 250px */
+  max-width: 300px;
+  backdrop-filter: blur(8px); 
+  background: rgba(22, 0, 168, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Responsive text size for smaller screens */
+@media (max-width: 768px) {
+  .district-chart-container {
+    flex: 1 1 100%; /* Take full width on tablets */
+    margin: 10px 0;
+  }
+
+  .top-crime-chart {
+    flex: 1 1 45%; /* Two charts per row */
+    margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .district-chart-container {
+    padding: 15px;
+  }
+
+  .top-crime-chart {
+    flex: 1 1 100%; /* Stack charts vertically on mobile */
+    margin: 10px 0;
+  }
 }
