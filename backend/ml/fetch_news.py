@@ -1,6 +1,7 @@
 import requests
 import feedparser
 import joblib
+import os
 import time
 import logging
 from pymongo import MongoClient
@@ -14,10 +15,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 
+# ----------------- Base Directory -----------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ----------------- Load ML model -----------------
 try:
-    model = joblib.load("crime_model.pkl", mmap_mode="r")
-    vectorizer = joblib.load("vectorizer.pkl", mmap_mode="r")
+    model_path = os.path.join(BASE_DIR, "crime_model.pkl")
+    vectorizer_path = os.path.join(BASE_DIR, "vectorizer.pkl")
+    
+    if not os.path.exists(model_path) or not os.path.exists(vectorizer_path):
+        raise FileNotFoundError("Model or vectorizer file missing!")
+
+    model = joblib.load(model_path, mmap_mode="r")
+    vectorizer = joblib.load(vectorizer_path, mmap_mode="r")
     logger.info("✅ Model & vectorizer loaded successfully.")
 except Exception as e:
     logger.error(f"❌ Error loading model/vectorizer: {e}")
@@ -36,12 +46,10 @@ recent_titles = set()
 MAX_CACHE_SIZE = 500  # prevent memory growth
 
 def already_seen(title):
-    """Check if article title already processed recently."""
     if title in recent_titles:
         return True
     recent_titles.add(title)
     if len(recent_titles) > MAX_CACHE_SIZE:
-        # Remove oldest entries to keep cache small
         recent_titles.pop()
     return False
 
@@ -70,7 +78,6 @@ def geocode_city(city):
     if city in city_cache:
         lat, lng = city_cache[city]
         return {"lat": lat, "lng": lng}
-
     try:
         time.sleep(1)
         location = geolocator.geocode(f"{city}, Maharashtra, India", timeout=10)
@@ -97,7 +104,7 @@ def extract_maharashtra_location(text):
 def get_crime_level(text):
     try:
         vec = vectorizer.transform([text])
-        return int(model.predict(vec)[0])  # 0, 1, or 2
+        return int(model.predict(vec)[0])  # 0,1,2
     except Exception as e:
         logger.error(f"❌ Prediction error: {e}")
         return -1
@@ -107,9 +114,8 @@ def save_if_crime(text, source):
     if already_seen(text):
         logger.info(f"⏭️ Skipped recently seen news: {text[:80]}")
         return
-
     level = get_crime_level(text)
-    if level not in [0, 1, 2]:
+    if level not in [0,1,2]:
         return
     location = extract_maharashtra_location(text)
     if not location:
@@ -122,7 +128,7 @@ def save_if_crime(text, source):
             "source": source,
             "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ")
         })
-        level_name = ["Low", "Medium", "High"][level]
+        level_name = ["Low","Medium","High"][level]
         logger.info(f"✅ Saved ({level_name}): {text[:80]} → {location}")
     else:
         logger.info(f"⚠️ Duplicate skipped (in DB): {text[:80]}")
@@ -132,8 +138,7 @@ def fetch_gnews():
     logger.info("🌐 Fetching from GNews.io...")
     try:
         url = "https://gnews.io/api/v4/search?q=crime%20maharashtra&lang=en&country=in&max=20&apikey=572b4058d84f38725165c0979b0aecdb"
-        response = requests.get(url, timeout=15)
-        data = response.json()
+        data = requests.get(url, timeout=15).json()
         for article in data.get("articles", []):
             title = article['title']
             text = f"{title}. {article.get('description', '')}"
@@ -145,8 +150,7 @@ def fetch_newsapi():
     logger.info("📰 Fetching from NewsAPI.org...")
     try:
         url = "https://newsapi.org/v2/everything?q=crime%20maharashtra&language=en&apiKey=2de9bd8806444aa3b0bc88bb6d5f14d2"
-        response = requests.get(url, timeout=15)
-        data = response.json()
+        data = requests.get(url, timeout=15).json()
         for article in data.get("articles", []):
             title = article['title']
             text = f"{title}. {article.get('description', '')}"
@@ -175,8 +179,8 @@ if __name__ == "__main__":
             fetch_newsapi()
             fetch_google_rss()
             logger.info("✅ Cycle complete — waiting 1 hour before next fetch...\n")
-            time.sleep(3600)  # ✅ 1 hour wait on success
+            time.sleep(3600)  # 1 hour
         except Exception as e:
             logger.error(f"❌ Main loop error: {e}")
             logger.info("⏳ Retrying in 60 seconds...")
-            time.sleep(60)  # ⚠️ retry after 60 sec on error
+            time.sleep(60)

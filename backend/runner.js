@@ -22,17 +22,20 @@ const { spawn } = require("child_process");
 const path = require("path");
 
 function runNewsJob() {
-  console.log("🚀 Running fetch_news.py on Render...");
+  console.log("🚀 Running fetch_news.py");
 
-  // ✅ Use relative path to backend/ml/fetch_news.py
-  const pythonPath = "python3"; // Render uses python3 globally
-  const scriptPath = path.join(__dirname, "ml", "fetch_news.py");
+  // Path to fetch_news.py (relative to news/)
+  const scriptPath = path.join(__dirname, "..", "ml", "fetch_news.py");
 
-  const process = spawn(pythonPath, [scriptPath]);
+  // Use the folder of fetch_news.py as cwd so Python finds .pkl files
+  const cwd = path.join(__dirname, "..", "ml");
 
-  process.stdout.on("data", (data) => console.log(`✅ Output: ${data}`));
-  process.stderr.on("data", (data) => console.error(`❌ Error: ${data}`));
-  process.on("close", (code) => console.log(`🔚 Exited with code ${code}`));
+  const py = spawn("python3", [scriptPath], { cwd });
+
+  py.stdout.on("data", (data) => console.log(`✅ ${data.toString()}`));
+  py.stderr.on("data", (data) => console.error(`❌ ${data.toString()}`));
+  py.on("close", (code) => console.log(`🔚 Exited with code ${code}`));
 }
 
 module.exports = { runNewsJob };
+
