@@ -7,7 +7,7 @@ const cors = require("cors");
 const { spawnSync } = require("child_process");
 
 const Post = require("./models/Post");
-const { runNewsJob } = require("./news/runner");
+const { runNewsJob } = require("./runner");
 
 const app = express();
 app.use(cors());
@@ -90,6 +90,7 @@ app.get("/api/profile", authMiddleware, async (req, res) => {
 // ------------------ Crime Endpoints ------------------
 
 // Classify + Save
+
 app.post("/api/classify", async (req, res) => {
   const { text, location } = req.body;
 

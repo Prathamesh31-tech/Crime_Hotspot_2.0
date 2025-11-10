@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from sklearn.cluster import KMeans
 
 # Connect to MongoDB
-client = MongoClient("mongodb+srv://prchaudhari3172_db_user:m6TAbyMSJ0AXJcia@cluster0.xdas6bd.mongodb.net/?appName=Cluster0")
+client = MongoClient("mongodb+srv://prchaudhari3172_db_user:m6TAbyMSJ0AXJcia@cluster0.xdas6bd.mongodb.net/?appName=Cluster0/crime-db")
 db = client["crime-db"]
 
 # Fetch posts where label is 0, 1, or 2 (crime-related)
