@@ -23,7 +23,11 @@ const CrimeMap = () => {
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 5000);
 
+<<<<<<< HEAD
     fetch("http://localhost:8080/api/heatmap")
+=======
+    fetch("https://crime-hotspot-2-0-5.onrender.com/api/heatmap")
+>>>>>>> b3c507f (Updated Version)
       .then((res) => res.json())
       .then(setPosts)
       .catch((err) => console.error("🔥 Fetch error:", err));

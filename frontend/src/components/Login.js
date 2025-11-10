@@ -24,7 +24,7 @@ function Login({ onLogin, switchToSignup }) {
         alert(data.error);
       }
     } catch (err) {
-      alert(err);
+      alert("Server Error");
     }
   };
 

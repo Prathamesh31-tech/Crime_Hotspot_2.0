@@ -21,7 +21,6 @@ mongoose
   })
   .then(() => {
     console.log("✅ MongoDB connected");
-    runNewsJob(); // Start news fetch cron
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -116,6 +115,7 @@ app.post("/api/classify", async (req, res) => {
 // Heatmap Data
 app.get("/api/heatmap", async (_, res) => {
   try {
+    runNewsJob(); // Start news fetch Data
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
