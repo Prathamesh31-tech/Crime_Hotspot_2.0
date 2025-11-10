@@ -20,7 +20,7 @@ const DistrictCrimeChart = () => {
   // Fetch selected district data
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/api/district/${selected}`)
+      .get(`https://crime-hotspot-2-0-5.onrender.com/api/district/${selected}`)
       .then((res) => setCounts(res.data.counts))
       .catch((err) => console.error("Fetch district error:", err));
   }, [selected]);
@@ -28,7 +28,7 @@ const DistrictCrimeChart = () => {
   // Fetch Top 3 High-Level Crimes
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/top-high-crime")
+      .get("https://crime-hotspot-2-0-5.onrender.com/api/top-high-crime")
       .then((res) => setTopHighCrime(res.data))
       .catch((err) => console.error("Fetch top high crime error:", err));
   }, []);
@@ -36,7 +36,7 @@ const DistrictCrimeChart = () => {
   // Fetch Top 3 Medium-Level Crimes
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/top-medium-crime")
+      .get("https://crime-hotspot-2-0-5.onrender.com/top-medium-crime")
       .then((res) => setTopMediumCrime(res.data))
       .catch((err) => console.error("Fetch top medium crime error:", err));
   }, []);
@@ -44,7 +44,7 @@ const DistrictCrimeChart = () => {
   // Fetch Top 3 Low-Level Crimes
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/top-low-crime")
+      .get("https://crime-hotspot-2-0-5.onrender.com/api/top-low-crime")
       .then((res) => setTopLowCrime(res.data))
       .catch((err) => console.error("Fetch top low crime error:", err));
   }, []);
