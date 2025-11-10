@@ -17,9 +17,9 @@
 // }
 
 // module.exports = { runNewsJob };
-
 const { spawn } = require("child_process");
 const path = require("path");
+const fs = require("fs");
 
 function runNewsJob() {
   console.log("🚀 Running fetch_news.py");
@@ -30,7 +30,10 @@ function runNewsJob() {
   // Use the folder of fetch_news.py as cwd so Python finds .pkl files
   const cwd = path.join(__dirname, "..", "ml");
 
-  const py = spawn("python3", [scriptPath], { cwd });
+  // Auto-detect python command (python3 locally, python on Render)
+  const pythonCmd = fs.existsSync("/usr/bin/python3") ? "python3" : "python";
+
+  const py = spawn(pythonCmd, [scriptPath], { cwd });
 
   py.stdout.on("data", (data) => console.log(`✅ ${data.toString()}`));
   py.stderr.on("data", (data) => console.error(`❌ ${data.toString()}`));
