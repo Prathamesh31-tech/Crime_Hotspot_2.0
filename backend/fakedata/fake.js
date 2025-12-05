@@ -15,56 +15,127 @@ mongoose
 
 async function insertDummyData() {
   // 👇 Yahaan apna actual array daalna hai
+
   const posts = [
     {
-      text: "Murder during property dispute in Nanded",
-      location: { lat: 19.1383, lng: 77.321 },
+      text: "Murder in Jalgaon market",
+      location: { lat: 21.0076, lng: 75.5626 },
       label: 2,
     },
     {
-      text: "Robbery at Satara gold shop",
-      location: { lat: 17.6805, lng: 74.0183 },
+      text: "Robbery at Amravati jewelry shop",
+      location: { lat: 20.9333, lng: 77.7797 },
       label: 1,
     },
     {
-      text: "Minor theft at Kolhapur bus stand",
-      location: { lat: 16.705, lng: 74.2433 },
-      label: 0,
-    },
-    {
-      text: "Arson in Aurangabad residential area",
-      location: { lat: 19.8762, lng: 75.3433 },
-      label: 2,
-    },
-    {
-      text: "Pickpocketing incidents in Mumbai local train",
-      location: { lat: 19.076, lng: 72.8777 },
-      label: 0,
-    },
-    {
-      text: "Kidnapping attempt in Pune market",
-      location: { lat: 18.5204, lng: 73.8567 },
-      label: 1,
-    },
-    {
-      text: "Murder of shop owner in Nashik",
-      location: { lat: 19.9975, lng: 73.7898 },
-      label: 2,
-    },
-    {
-      text: "Car theft in Nagpur city",
+      text: "Pickpocketing in Nagpur bus stand",
       location: { lat: 21.1458, lng: 79.0882 },
       label: 0,
     },
     {
-      text: "Robbery in Solapur jewelry store",
+      text: "Arson in Mumbai suburban area",
+      location: { lat: 19.076, lng: 72.8777 },
+      label: 2,
+    },
+    {
+      text: "Minor theft in Pune local market",
+      location: { lat: 18.5204, lng: 73.8567 },
+      label: 0,
+    },
+    {
+      text: "Kidnapping attempt in Nashik city",
+      location: { lat: 19.9975, lng: 73.7898 },
+      label: 1,
+    },
+    {
+      text: "Murder over property dispute in Thane",
+      location: { lat: 19.2183, lng: 72.9781 },
+      label: 2,
+    },
+    {
+      text: "Robbery at Solapur bank",
       location: { lat: 17.6599, lng: 75.9064 },
       label: 1,
     },
     {
-      text: "Chain snatching at Thane highway",
-      location: { lat: 19.2183, lng: 72.9781 },
+      text: "Car theft in Aurangabad downtown",
+      location: { lat: 19.8762, lng: 75.3433 },
+      label: 0,
+    },
+    {
+      text: "Chain snatching in Kolhapur bus stand",
+      location: { lat: 16.705, lng: 74.2433 },
       label: 1,
+    },
+    {
+      text: "Rape reported in Jalna village",
+      location: { lat: 19.832, lng: 75.886 },
+      label: 2,
+    },
+    {
+      text: "Pickpocketing in Chandrapur market",
+      location: { lat: 19.96, lng: 79.3 },
+      label: 0,
+    },
+    {
+      text: "Armed robbery in Latur city",
+      location: { lat: 18.4088, lng: 76.5603 },
+      label: 2,
+    },
+    {
+      text: "Minor theft in Akola residential area",
+      location: { lat: 20.71, lng: 77.0059 },
+      label: 0,
+    },
+    {
+      text: "Kidnapping in Buldhana town",
+      location: { lat: 20.541, lng: 76.182 },
+      label: 1,
+    },
+    {
+      text: "Murder in Nanded downtown",
+      location: { lat: 19.1383, lng: 77.321 },
+      label: 2,
+    },
+    {
+      text: "Robbery at Satara jewelry shop",
+      location: { lat: 17.6805, lng: 74.0183 },
+      label: 1,
+    },
+    {
+      text: "Pickpocketing in Ahmednagar market",
+      location: { lat: 19.0952, lng: 74.7496 },
+      label: 0,
+    },
+    {
+      text: "Arson in Ratnagiri village",
+      location: { lat: 16.99, lng: 73.312 },
+      label: 2,
+    },
+    {
+      text: "Minor theft in Sindhudurg city",
+      location: { lat: 16.1297, lng: 73.512 },
+      label: 0,
+    },
+    {
+      text: "Robbery at Nagpur mall",
+      location: { lat: 21.1458, lng: 79.0882 },
+      label: 1,
+    },
+    {
+      text: "Murder over political rivalry in Nashik",
+      location: { lat: 19.9975, lng: 73.7898 },
+      label: 2,
+    },
+    {
+      text: "Gold chain theft in Pune market",
+      location: { lat: 18.5204, lng: 73.8567 },
+      label: 1,
+    },
+    {
+      text: "Mobile snatching in Thane highway",
+      location: { lat: 19.2183, lng: 72.9781 },
+      label: 0,
     },
     {
       text: "Murder during family feud in Kolhapur",
@@ -72,12 +143,12 @@ async function insertDummyData() {
       label: 2,
     },
     {
-      text: "Snatching in Aurangabad railway station",
+      text: "Robbery at Aurangabad mall",
       location: { lat: 19.8762, lng: 75.3433 },
       label: 1,
     },
     {
-      text: "Pickpocketing in Mumbai suburban area",
+      text: "Pickpocketing in Mumbai suburban train",
       location: { lat: 19.076, lng: 72.8777 },
       label: 0,
     },
@@ -92,87 +163,7 @@ async function insertDummyData() {
       label: 0,
     },
     {
-      text: "Murder due to political rivalry in Nagpur",
-      location: { lat: 21.1458, lng: 79.0882 },
-      label: 2,
-    },
-    {
-      text: "Gold chain theft in Solapur city",
-      location: { lat: 17.6599, lng: 75.9064 },
-      label: 1,
-    },
-    {
-      text: "Mobile snatching in Thane city",
-      location: { lat: 19.2183, lng: 72.9781 },
-      label: 0,
-    },
-    {
-      text: "Rape reported in Kolhapur village",
-      location: { lat: 16.705, lng: 74.2433 },
-      label: 2,
-    },
-    {
-      text: "Robbery at Aurangabad mall",
-      location: { lat: 19.8762, lng: 75.3433 },
-      label: 1,
-    },
-    {
-      text: "Theft of vehicle in Mumbai suburb",
-      location: { lat: 19.076, lng: 72.8777 },
-      label: 0,
-    },
-    {
-      text: "Murder during fight in Pune residential colony",
-      location: { lat: 18.5204, lng: 73.8567 },
-      label: 2,
-    },
-    {
-      text: "Pickpocketing in Nashik railway station",
-      location: { lat: 19.9975, lng: 73.7898 },
-      label: 0,
-    },
-    {
-      text: "Robbery at Nagpur bank",
-      location: { lat: 21.1458, lng: 79.0882 },
-      label: 1,
-    },
-    {
-      text: "Mobile theft in Solapur market",
-      location: { lat: 17.6599, lng: 75.9064 },
-      label: 0,
-    },
-    {
-      text: "Chain snatching incident in Thane suburb",
-      location: { lat: 19.2183, lng: 72.9781 },
-      label: 1,
-    },
-    {
-      text: "Murder due to family dispute in Kolhapur city",
-      location: { lat: 16.705, lng: 74.2433 },
-      label: 2,
-    },
-    {
-      text: "Robbery in Aurangabad old city",
-      location: { lat: 19.8762, lng: 75.3433 },
-      label: 1,
-    },
-    {
-      text: "Pickpocketing in Mumbai local market",
-      location: { lat: 19.076, lng: 72.8777 },
-      label: 0,
-    },
-    {
-      text: "Armed robbery at Pune ATM",
-      location: { lat: 18.5204, lng: 73.8567 },
-      label: 1,
-    },
-    {
-      text: "Minor theft in Nashik residential colony",
-      location: { lat: 19.9975, lng: 73.7898 },
-      label: 0,
-    },
-    {
-      text: "Murder over political clash in Nagpur",
+      text: "Murder due to political clash in Nagpur",
       location: { lat: 21.1458, lng: 79.0882 },
       label: 2,
     },
@@ -202,7 +193,7 @@ async function insertDummyData() {
       label: 0,
     },
     {
-      text: "Gold chain theft in Pune market",
+      text: "Gold chain theft in Pune suburb",
       location: { lat: 18.5204, lng: 73.8567 },
       label: 1,
     },
@@ -237,7 +228,7 @@ async function insertDummyData() {
       label: 1,
     },
     {
-      text: "Pickpocketing in Mumbai suburban train",
+      text: "Pickpocketing in Mumbai night market",
       location: { lat: 19.076, lng: 72.8777 },
       label: 0,
     },
@@ -286,6 +277,7 @@ async function insertDummyData() {
       location: { lat: 18.5204, lng: 73.8567 },
       label: 1,
     },
+    // ... continue similarly to reach 100 entries
   ];
 
   // ✅ Insert all at once

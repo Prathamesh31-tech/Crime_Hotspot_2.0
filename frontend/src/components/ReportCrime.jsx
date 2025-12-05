@@ -11,7 +11,7 @@ export default function ReportForm() {
   const onSubmit = async e => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`https://crime-hotspot-2-0-5.onrender.com/api/classify`, {
+      const { data } = await axios.post(`https://crime-hotspot-2-0-5.onrender.com/api/classify`, { 
         text,
         location: { lat: parseFloat(lat), lng: parseFloat(lng) }
       });

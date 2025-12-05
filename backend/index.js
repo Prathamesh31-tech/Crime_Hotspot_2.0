@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const { spawnSync } = require("child_process");
+
+// ✅ FIX: Import spawnSync also
+const { spawn, spawnSync } = require("child_process");
 
 const Post = require("./models/Post");
 const { runNewsJob } = require("./runner");
@@ -15,13 +17,8 @@ app.use(express.json());
 
 // ------------------ MongoDB Connection ------------------
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("✅ MongoDB connected");
-  })
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ------------------ User Auth ------------------
@@ -62,7 +59,7 @@ app.post("/api/login", async (req, res) => {
     });
     res.json({ token, name: user.name });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -76,12 +73,12 @@ const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
     req.userId = decoded.id;
     next();
-  } catch (err) {
+  } catch {
     res.status(401).json({ error: "Invalid token" });
   }
 };
 
-// Protected route example
+// Profile
 app.get("/api/profile", authMiddleware, async (req, res) => {
   const user = await User.findById(req.userId).select("-password");
   res.json(user);
@@ -90,33 +87,38 @@ app.get("/api/profile", authMiddleware, async (req, res) => {
 // ------------------ Crime Endpoints ------------------
 
 // Classify + Save
-
 app.post("/api/classify", async (req, res) => {
   const { text, location } = req.body;
 
   try {
-    const result = spawnSync("python3", ["./ml/predict.py", text]);
-    const label = parseInt(result.stdout.toString().trim());
+    const result = spawn("python", ["./ml/predict.py", text]);
+    let output = "";
 
-    const isAuthenticCrime = (text) => true; // Placeholder
+    result.stdout.on("data", (data) => (output += data.toString()));
+    result.stderr.on("data", (data) => console.error(data.toString()));
 
-    if (label === 1 && isAuthenticCrime(text)) {
-      const newPost = new Post({ text, location, label });
-      await newPost.save();
-      return res.json({ label, stored: true });
-    } else {
-      return res.json({ label, stored: false });
-    }
+    result.on("close", async () => {
+      const label = parseInt(output.trim());
+      const isAuthenticCrime = () => true;
+
+      if (label === 1 && isAuthenticCrime(text)) {
+        const newPost = new Post({ text, location, label });
+        await newPost.save();
+        return res.json({ label, stored: true });
+      } else {
+        return res.json({ label, stored: false });
+      }
+    });
   } catch (error) {
     console.error("❌ Error in /api/classify:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 // Heatmap Data
 app.get("/api/heatmap", async (_, res) => {
   try {
-    runNewsJob(); // Start news fetch Data
+    await runNewsJob();
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
@@ -137,7 +139,7 @@ app.get("/api/district/:name", async (req, res) => {
     posts.forEach((p) => {
       if (p.label === 2) counts.high++;
       else if (p.label === 1) counts.medium++;
-      else if (p.label === 0) counts.low++;
+      else counts.low++;
     });
 
     res.json({ district, counts });
@@ -147,27 +149,33 @@ app.get("/api/district/:name", async (req, res) => {
   }
 });
 
-// Hotspot Prediction
-app.get("/api/hotspot", (req, res) => {
+// ---------------- HOTSPOT PREDICTION (FIXED) ----------------
+app.get("/api/hotspot", async (req, res) => {
   try {
-    const result = spawnSync("python", ["./ml/hotspot_predict.py"]);
-    const output = result.stdout.toString().trim();
+    const result = spawnSync("python", ["./ml/hotspot_predict.py"], {
+      encoding: "utf-8",
+    });
 
-    if (output === "No crime data available") {
+    if (result.error) {
+      console.error("Python execution failed:", result.error);
+      return res.status(500).json({ error: "Python failed to run" });
+    }
+
+    const output = result.stdout.trim();
+
+    if (!output || output === "No crime data available") {
       return res.json({ hotspot: null });
     }
 
     const [lat, lng] = output.split(",");
-    res.json({
-      hotspot: { lat: parseFloat(lat), lng: parseFloat(lng) },
-    });
+    res.json({ hotspot: { lat: parseFloat(lat), lng: parseFloat(lng) } });
   } catch (error) {
     console.error("❌ Error in /api/hotspot:", error);
     res.status(500).json({ error: "Hotspot prediction failed" });
   }
 });
 
-// Top 3 Crime Data Endpoints
+// ------------------ Top Crimes ------------------
 const getTopCrimes = async (label) => {
   const posts = await Post.find({ label });
   const districtCounts = {};
@@ -184,36 +192,51 @@ const getTopCrimes = async (label) => {
 };
 
 app.get("/api/top-high-crime", async (req, res) => {
-  try {
-    const topDistricts = await getTopCrimes(2);
-    res.json(topDistricts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch top high crime data" });
-  }
+  res.json(await getTopCrimes(2));
 });
 
 app.get("/api/top-medium-crime", async (req, res) => {
-  try {
-    const topDistricts = await getTopCrimes(1);
-    res.json(topDistricts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch top medium crime data" });
-  }
+  res.json(await getTopCrimes(1));
 });
 
 app.get("/api/top-low-crime", async (req, res) => {
-  try {
-    const topDistricts = await getTopCrimes(0);
-    res.json(topDistricts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch top low crime data" });
-  }
+  res.json(await getTopCrimes(0));
 });
 
-// ------------------ Start Server ------------------
+// Helper function: Top 3 safe districts by label
+
+const getSafeCrimes = async (label) => {
+  const posts = await Post.find({ label });
+  const districtCounts = {};
+
+  // Count crimes per district
+  posts.forEach((p) => {
+    const location = p.location || "Unknown";
+    districtCounts[location] = (districtCounts[location] || 0) + 1;
+  });
+
+  // Filter out districts with 0 crimes, sort ascending, and take top 3
+  return Object.entries(districtCounts)
+    .map(([district, count]) => ({ district, count }))
+    .filter((item) => item.count > 0) // Only consider districts with at least 1 crime
+    .sort((a, b) => a.count - b.count) // Ascending order
+    .slice(0, 3); // Top 3 safe districts
+};
+
+// Endpoints for safe districts
+app.get("/api/safe-high-crime", async (req, res) => {
+  res.json(await getSafeCrimes(2)); // high-level crime label
+});
+
+app.get("/api/safe-medium-crime", async (req, res) => {
+  res.json(await getSafeCrimes(1)); // medium-level crime label
+});
+
+app.get("/api/safe-low-crime", async (req, res) => {
+  res.json(await getSafeCrimes(0)); // low-level crime label
+});
+
+// ------------------ START SERVER ------------------
 app.listen(process.env.PORT || 8080, () =>
   console.log(`🚀 Backend running on port ${process.env.PORT || 8080}`)
 );
