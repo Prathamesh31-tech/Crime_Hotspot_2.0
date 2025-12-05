@@ -1,18 +1,23 @@
-/* ===============================
-   DISTRICT CRIME CHART STYLING
-================================= */
+.main-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* Bar chart container */
 .district-chart-container {
-  flex: 1 1 400px; /* Flexible width, min 400px */
-  min-width: 300px;
+  flex: 1 1 400px; /* Default for laptop */
+  min-width: 350px;
   margin: 10px;
   margin-top: 30px;
-  backdrop-filter: blur(8px); 
+  backdrop-filter: blur(8px);
   background: rgba(22, 0, 168, 0.1);
   border-radius: 10px;
   padding: 20px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  color: rgb(255, 255, 255);
+  color: white;
 }
 
 .district-chart-container select {
@@ -25,47 +30,60 @@
   font-size: 16px;
 }
 
-/* Pie chart container */
+/* Pie charts grid */
 .pieChart {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center; /* Center charts on smaller screens */
-  margin-top: 30px;
+  margin: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 100px;
+  flex: 2 1 600px; /* Default for laptop */
 }
 
-/* Individual pie charts */
+/* Individual pie chart styling */
 .top-crime-chart {
-  flex: 1 1 250px; /* Flexible width, min 250px */
-  max-width: 300px;
-  backdrop-filter: blur(8px); 
+  backdrop-filter: blur(8px);
   background: rgba(22, 0, 168, 0.1);
   border-radius: 10px;
   text-align: center;
   padding: 10px;
 }
 
-/* Responsive text size for smaller screens */
-@media (max-width: 768px) {
+/* Responsive: Tablets */
+@media (max-width: 1024px) {
   .district-chart-container {
-    flex: 1 1 100%; /* Take full width on tablets */
-    margin: 10px 0;
+    flex: 1 1 100%;
   }
 
-  .top-crime-chart {
-    flex: 1 1 45%; /* Two charts per row */
-    margin: 10px;
+  .pieChart {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
-@media (max-width: 480px) {
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+  .pieChart {
+    grid-template-columns: 1fr; /* Stack all pie charts vertically */
+  }
+
   .district-chart-container {
+    flex: 1 1 100%;
     padding: 15px;
   }
 
   .top-crime-chart {
-    flex: 1 1 100%; /* Stack charts vertically on mobile */
     margin: 10px 0;
+  }
+}
+
+.graphheading{
+   font-size: 2rem;
+  font-weight: bold;
+}
+
+
+@media (max-width: 600px) {
+  .graphheading {
+    font-size: 1.2rem;
+
   }
 }

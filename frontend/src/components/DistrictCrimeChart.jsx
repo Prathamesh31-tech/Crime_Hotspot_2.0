@@ -76,7 +76,6 @@ const DistrictCrimeChart = () => {
     hover: { mode: null }
   };
 
-  // Fetch district counts
   useEffect(() => {
     axios
       .get(`https://crime-hotspot-2-0-5.onrender.com/api/district/${selected}`)
@@ -100,28 +99,16 @@ const DistrictCrimeChart = () => {
   };
 
   useEffect(() => {
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-high-crime")
-      .then((res) => setTopHighCrime(convertDistrictData(res.data)))
-      .catch(console.error);
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-medium-crime")
-      .then((res) => setTopMediumCrime(convertDistrictData(res.data)))
-      .catch(console.error);
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-low-crime")
-      .then((res) => setTopLowCrime(convertDistrictData(res.data)))
-      .catch(console.error);
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-high-crime")
-      .then((res) => setTopSafeHigh(convertDistrictData(res.data)))
-      .catch(console.error);
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-medium-crime")
-      .then((res) => setTopSafeMedium(convertDistrictData(res.data)))
-      .catch(console.error);
-    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-low-crime")
-      .then((res) => setTopSafeLow(convertDistrictData(res.data)))
-      .catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-high-crime").then((res) => setTopHighCrime(convertDistrictData(res.data))).catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-medium-crime").then((res) => setTopMediumCrime(convertDistrictData(res.data))).catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/top-low-crime").then((res) => setTopLowCrime(convertDistrictData(res.data))).catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-high-crime").then((res) => setTopSafeHigh(convertDistrictData(res.data))).catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-medium-crime").then((res) => setTopSafeMedium(convertDistrictData(res.data))).catch(console.error);
+    axios.get("https://crime-hotspot-2-0-5.onrender.com/api/safe-low-crime").then((res) => setTopSafeLow(convertDistrictData(res.data))).catch(console.error);
   }, []);
 
   const data = {
-    labels: ["High-Level Crime", "Medium-Level Crime", "Low-Level Crime"],
+    labels: ["High-Level", "Medium-Level ", "Low-Level"],
     datasets: [
       { label: `Crime Levels in ${selected}`, data: [counts.high, counts.medium, counts.low], backgroundColor: ["#ff0000", "#ffa500", "#ffff00"] },
     ],
@@ -141,45 +128,29 @@ const DistrictCrimeChart = () => {
   });
 
   return (
-    <div className="main" style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
-      <div className="district-chart-container" style={{ flex: "1 1 400px" }}>
-        <h2>📊 District Crime Visualization</h2>
+    <div className="main-container">
+      <div className="district-chart-container">
+        <div className="graphheading">📊 District Crime Visualization</div>
         <select value={selected} onChange={(e) => setSelected(e.target.value)}>
           {districts.map(d => <option key={d}>{d}</option>)}
         </select>
         <Bar data={data} options={barOptions} />
       </div>
-          
-      <div className="pieChart" style={{flex: "2 1 600px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "2rem"}}>
-        <div className="subpieChart" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "2rem"}}>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🔴 Top 3 High Crime</h4>
-            <Pie data={generatePieData(topHighCrime, "High Crime", ["#ff0000ff", "#ff4c4cff", "#fb9391ff"])} options={pieOptions} />
-          </div>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🟠 Top 3 Medium Crime</h4>
-            <Pie data={generatePieData(topMediumCrime, "Medium Crime", ["#ffa500ff", "#ffb84cff", "#ffd19cff"])} options={pieOptions} />
-          </div>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🟡 Top 3 Low Crime</h4>
-            <Pie data={generatePieData(topLowCrime, "Low Crime", ["#ffea00ff", "#f4ff78ff", "#ffffffff"])} options={pieOptions} />
-          </div>
-        </div>
 
-        <div className="subpieChart" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "2rem"}}>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🟢 Top 3 Safe (High Crime)</h4>
-            <Pie data={generatePieData(topSafeHigh, "Safe High Crime", ["#00ff00ff", "#4cff4cff", "#91fb91ff"])} options={pieOptions} />
+      <div className="pieChart">
+        {[ 
+          { title: "Top 3 High Crime", data: topHighCrime, colors: ["#ff0000ff", "#ff4c4cff", "#fb9391ff"] },
+          { title: "Top 3 Medium Crime", data: topMediumCrime, colors: ["#ffa500ff", "#ffb84cff", "#ffd19cff"] },
+          { title: "Top 3 Low Crime", data: topLowCrime, colors: ["#ffea00ff", "#f4ff78ff", "#ffffffff"] },
+          { title: "Top 3 Safe (High Crime)", data: topSafeHigh, colors: ["#00ff00ff", "#4cff4cff", "#91fb91ff"] },
+          { title: "Top 3 Safe (Medium Crime)", data: topSafeMedium, colors: ["#00aaffff", "#4ccfff", "#91e0fbff"] },
+          { title: "Top 3 Safe (Low Crime)", data: topSafeLow, colors: ["#aa00ffff", "#cc4cff", "#e091fbff"] },
+        ].map((chart, idx) => (
+          <div key={idx} className="top-crime-chart">
+            <h4 style={{ color: "white" }}>{chart.title}</h4>
+            <Pie data={generatePieData(chart.data, chart.title, chart.colors)} options={pieOptions} />
           </div>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🔵 Top 3 Safe (Medium Crime)</h4>
-            <Pie data={generatePieData(topSafeMedium, "Safe Medium Crime", ["#00aaffff", "#4ccfff", "#91e0fbff"])} options={pieOptions} />
-          </div>
-          <div className="top-crime-chart">
-            <h4 style={{ color: "white" }}>🟣 Top 3 Safe (Low Crime)</h4>
-            <Pie data={generatePieData(topSafeLow, "Safe Low Crime", ["#aa00ffff", "#cc4cff", "#e091fbff"])} options={pieOptions} />
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
